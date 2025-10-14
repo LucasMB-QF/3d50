@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1.0, user-scalable=no" />
+  <title>Transfarma | Visor 3D</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* =================== Tipografía =================== */
+    :root{
+      --font-primary: 'Century Gothic', 'AppleGothic', 'Avantgarde', 'URW Gothic',
+                      'Segoe UI', Calibri, Arial, sans-serif;
+      --font-secondary: var(--font-primary);
+    }
+    html{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    /* =============== Paleta / Tema =============== */
+    :root, [data-theme="dark"]{
+      --primary-green:#8BC540; --primary-blue:#4d8ff2; --secondary-blue:#003C88;
+      --bg-primary:#121826; --bg-header:#1a2236; --bg-card:#1a2236; --card-border:#2a3550;
+      --text-primary:#e6eefb; --text-secondary:#9bb0d0; --text-muted:#8a9bb8;
+      --shadow:0 4px 6px rgba(0,0,0,.3); --card-shadow:0 6px 15px rgba(0,0,0,.4);
+      --icon-bg:rgba(0,60,136,.2); --footer-bg:var(--bg-header); --footer-text:var(--text-secondary);
+      --toggle-icon:'\f185';
+      --accent:#FFD166;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(13,60,136,.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(139,197,64,.1) 0%, transparent 20%);
+    }
+    [data-theme="light"]{
+      --primary-green:#8BC540; --primary-blue:#003C88; --secondary-gray:#5E5E5E;
+      --light-gray:#f5f7fa; --medium-gray:#e0e6ed;
+      --text-dark:#2d3748; --text-light:#718096;
+      --shadow:0 4px 6px rgba(0,0,0,.1); --card-shadow:0 6px 15px rgba(0,60,136,.1);
+      --bg-primary:linear-gradient(135deg,#f8fafc,#f0f5f9);
+      --bg-header:#fff; --bg-card:#fff; --card-border:var(--medium-gray);
+      --text-primary:var(--text-dark); --text-secondary:#5E6A82; --text-muted:var(--text-light);
+      --icon-bg:rgba(0,60,136,.1); --footer-bg:var(--primary-blue); --footer-text:#fff; --toggle-icon:'\f186';
+      --accent:#F59E0B;
+    }
+
+    /* =============== Base =============== */
+    *{margin:0;padding:0;box-sizing:border-box; font-family:var(--font-primary)}
+    body{background:var(--bg-primary);color:var(--text-primary);min-height:100vh}
+    .container{max-width:1400px;margin:0 auto;padding:0 20px}
+
+    /* =============== Header =============== */
+    .company-header{background:var(--bg-header);padding:15px 0;box-shadow:var(--shadow);border-bottom:3px solid var(--primary-green)}
+    .header-container{display:flex;align-items:center;justify-content:space-between;max-width:1400px;margin:0 auto;padding:0 20px}
+    .logo-container{display:flex;align-items:center;gap:15px}
+    .logo-container img{height:50px;filter:brightness(.94)}
+    .company-name{font-size:1.7rem;font-weight:700;letter-spacing:.2px}
+    .company-tagline{font-size:1rem;color:var(--text-secondary);letter-spacing:.2px}
+
+    /* =============== Main =============== */
+    .main-content{padding:30px 0}
+    .page-header{text-align:center;margin-bottom:30px;padding:0 15px}
+    .page-title{
+      font-size:2rem;font-weight:700;margin-bottom:15px;position:relative;display:inline-block;padding-bottom:10px;
+      letter-spacing:.3px;
+    }
+    .page-title::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:108px;height:4px;background:var(--primary-green);border-radius:2px}
+
+    .model-container{background:var(--bg-card);border-radius:12px;box-shadow:var(--card-shadow);margin-top:20px;border:1px solid var(--card-border);border-top:4px solid var(--primary-blue);overflow:hidden}
+    .section-header{display:flex;align-items:center;padding:15px;border-bottom:2px solid var(--icon-bg)}
+    .section-icon{width:40px;height:40px;background:var(--icon-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-right:12px;font-size:1.1rem;color:#003C88}
+    .section-title{font-size:1.22rem;font-weight:700;letter-spacing:.2px}
+    .card{padding:18px}
+    .card p{line-height:1.55}
+
+    /* Llamados de atención */
+    .callout{
+      display:flex;gap:12px;align-items:flex-start;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid #2a3550; border-radius:12px; padding:14px 16px; margin-bottom:12px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .callout .ico{
+      width:36px;height:36px;min-width:36px;display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.08); border-radius:10px; font-size:1.05rem; color:#fff;
+    }
+    .callout strong{letter-spacing:.2px}
+    .callout.warning{border-color: rgba(245, 158, 11, .45)}
+    .callout.success{border-color: rgba(139,197,64,.45)}
+    .pulse{
+      animation: pulse 1.6s ease-in-out infinite;
+      box-shadow: 0 0 0 0 rgba(139,197,64,.6);
+    }
+    @keyframes pulse{
+      0%{ box-shadow: 0 0 0 0 rgba(139,197,64,.6); }
+      70%{ box-shadow: 0 0 0 14px rgba(139,197,64,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(139,197,64,0); }
+    }
+
+    .tip{background:rgba(255,255,255,.05);border:1px dashed #2a3550;border-radius:12px;padding:16px;margin-top:12px}
+
+    /* Bloque para compartir */
+    .share{
+      margin-top:16px; border:1px solid #2a3550; border-radius:12px; padding:12px 12px; background:rgba(255,255,255,.04);
+    }
+    .share-row{display:flex;gap:8px;align-items:center; margin-top:8px}
+    .share input{
+      flex:1; min-width:0; border:1px solid #2a3550; background:#0f1524; color:#e6eefb;
+      border-radius:10px; padding:.6rem .7rem; font-size:.95rem
+    }
+    .copy-btn{border:0; border-radius:10px; padding:.58rem .8rem; background:#4d8ff2; color:#fff; font-weight:700; cursor:pointer}
+
+    /* =============== Footer =============== */
+    .footer{background:var(--footer-bg);color:var(--footer-text);padding:20px 0;margin-top:30px}
+    .footer-container{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0 20px}
+    .footer-logo img{height:35px;filter:brightness(.88)}
+    .footer-text{font-size:.85rem;text-align:right}
+
+    /* =============== Toggle tema =============== */
+    .theme-toggle{
+      position:fixed;bottom:20px;left:20px;width:50px;height:50px;background:var(--bg-card);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:var(--shadow);
+      border:1px solid var(--card-border);font-size:1.2rem
+    }
+    .theme-toggle::before{content:var(--toggle-icon);font-family:'Font Awesome 5 Free';font-weight:900}
+
+    /* =============== Responsive =============== */
+    @media (max-width:768px){
+      .header-container{flex-direction:column;text-align:center;gap:10px}
+      .logo-container{justify-content:center}
+      .page-title{font-size:1.6rem}
+      .footer-container{flex-direction:column;gap:15px;text-align:center}
+      .footer-text{text-align:center}
+      .share-row{flex-direction:column; align-items:stretch}
+      .copy-btn{width:100%}
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <!-- Header -->
+  <header class="company-header">
+    <div class="header-container">
+      <div class="logo-container">
+        <img src="https://transfarma.cl/wp-content/uploads/2024/06/logo-transfarma-vec.png" alt="Transfarma">
+        <div>
+          <div class="company-name">TRANSFARMA</div>
+          <div class="company-tagline">Logística farmacéutica</div>
+        </div>
+      </div>
+      <div class="header-info"></div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <div class="container">
+    <div class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">Visor 3D del contenedor</h1>
+      </div>
+
+      <div class="model-container">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-box"></i></div>
+          <h2 class="section-title">Instrucciones rápidas</h2>
+        </div>
+        <div class="card" aria-live="polite">
+          <!-- Mensajes más llamativos -->
+          <div class="callout success pulse" id="orientMsg">
+            <div class="ico"><i class="fas fa-mobile-screen"></i></div>
+            <div>
+              <strong>Mantén el teléfono en <u>horizontal</u></strong><br>
+              Al detectar que está en horizontal, <b>abriremos el visor automáticamente</b>.
+            </div>
+          </div>
+
+          <div class="callout warning">
+            <div class="ico"><i class="fas fa-triangle-exclamation"></i></div>
+            <div>
+              <strong>¿Ves “problema de gráficos” dentro del visor?</strong><br>
+              Toca <b>Recargar</b> en el visor para reintentar con el motor compatible.
+            </div>
+          </div>
+
+          <!-- Bloque para compartir / abrir en PC -->
+          <div class="share" id="shareBox">
+            <strong><i class="fas fa-share-nodes"></i> Compartir o abrir en PC</strong>
+            <p class="muted">Copia este enlace y envíalo por WhatsApp/Correo para abrirlo en computador:</p>
+            <div class="share-row">
+              <input id="shareLink" type="text" readonly>
+              <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Copiar</button>
+            </div>
+            <p class="muted" id="copyHint" style="margin-top:6px; display:none;">¡Enlace copiado!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-logo">
+        <img src="https://transfarma.cl/wp-content/uploads/2024/06/logo-transfarma-vec.png" alt="Transfarma">
+      </div>
+      <div class="footer-text">
+        <p>Sistema de Visualización 3D &copy; 2025 | Transfarma</p>
+        <p>Av. Américo Vespucio 1385, Santiago, Chile</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toggle tema -->
+  <div class="theme-toggle" id="theme-toggle" title="Cambiar tema"></div>
+
+  <script>
+    // === Tema (guarda preferencia) ===
+    const body = document.body;
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const t = body.getAttribute('data-theme'); const n = t === 'dark' ? 'light' : 'dark';
+      body.setAttribute('data-theme', n); localStorage.setItem('theme', n);
+    });
+    body.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+
+    // === Link de destino ===
+    // Por defecto (puedes editar este valor si quieres “fijar” un modelo concreto):
+    const LINK_POR_DEFECTO = "https://app.sketchup.com/share/tc/northAmerica/CFBCELInkOo?source=desktop&stoken=XhCNbzSe9_IPVfJPQBwWGeNh7ZgxzIFBy3miwahZgL40tXfLRdwmoJIZPi8qXfyx";
+    // O pasar en la URL: ?link=<URL codificada>
+    const params = new URLSearchParams(location.search);
+    const qsLink = params.get("link");
+    const DESTINO = qsLink ? decodeURIComponent(qsLink) : LINK_POR_DEFECTO;
+
+    // === Bloque de compartir: usar SIEMPRE tu dominio (no mostrar SketchUp) ===
+    const SHARE_URL = "https://esquema-99l.netlify.app";
+    const shareInput = document.getElementById('shareLink');
+    shareInput.value = SHARE_URL;
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(SHARE_URL);
+        const hint = document.getElementById('copyHint');
+        hint.style.display = 'block';
+        setTimeout(()=>hint.style.display='none', 1500);
+      }catch(e){
+        // Fallback
+        shareInput.select(); document.execCommand('copy');
+      }
+    });
+
+    // === Redirección condicional (sin botones) ===
+    const mql = window.matchMedia('(orientation: landscape)');
+    const isLandscape = () => mql.matches;
+    function ir(){ location.replace(DESTINO); } // no deja esta portada en el historial
+
+    // Mensaje de orientación dinámico
+    const orientMsg = document.getElementById('orientMsg');
+    function updateOrientCallout(){
+      orientMsg.style.display = isLandscape() ? 'none' : 'flex';
+    }
+
+    // Auto-abrir si ya está en horizontal
+    if (isLandscape()) ir();
+    updateOrientCallout();
+
+    // Escuchar orientación (mecanismos modernos y fallback)
+    if (screen.orientation && screen.orientation.addEventListener) {
+      screen.orientation.addEventListener('change', () => { updateOrientCallout(); if (isLandscape()) ir(); });
+    }
+    if (mql.addEventListener) {
+      mql.addEventListener('change', e => { updateOrientCallout(); if (e.matches) ir(); });
+    } else if (mql.addListener) {
+      mql.addListener(e => { updateOrientCallout(); if (e.matches) ir(); });
+    }
+    window.addEventListener('orientationchange', () => { updateOrientCallout(); if (isLandscape()) ir(); });
+  </script>
+</body>
+</html>
